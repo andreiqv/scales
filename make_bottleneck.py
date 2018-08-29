@@ -107,6 +107,7 @@ def create_bootleneck_data(dir_path, shape):
 	image_size = (shape[0], shape[1])
 	feature_vectors, labels, filenames = [], [], []
 	class_index_set = set()
+	num_classes = 412
 
 	files = os.listdir(dir_path)
 	random.shuffle(files)
@@ -139,6 +140,13 @@ def create_bootleneck_data(dir_path, shape):
 			except:
 				continue
 
+			if class_index >= num_classes:
+				logging.error('class_index >= num_classes')	
+				sys.exit(1)
+
+			label = [0]*num_classes
+			label[class_index] = 1	
+
 			class_index_set.add(class_index)	
 
 			file_path = dir_path + '/' + filename
@@ -146,7 +154,7 @@ def create_bootleneck_data(dir_path, shape):
 			#sx, sy = im.size
 			im = im.resize(image_size, Image.ANTIALIAS)
 			arr = np.array(im, dtype=np.float32) / 256
-			label = class_index
+
 				
 			#feature_vector = bottleneck_tensor.eval(feed_dict={ x : [arr] })
 			feature_vector = None

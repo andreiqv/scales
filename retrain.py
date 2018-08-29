@@ -195,6 +195,7 @@ if __name__ == '__main__':
 	SAMPLE_SIZE = train['size']
 	min_valid_loss = 1000
 
+	num_classes 
 
 	#-------------------
 
@@ -206,7 +207,7 @@ if __name__ == '__main__':
 		# 1. Construct a graph representing the model.
 		
 		x = tf.placeholder(tf.float32, [None, 1, bottleneck_tensor_size], name='Placeholder-x') # Placeholder for input.
-		y = tf.placeholder(tf.float32, [None, 1], name='Placeholder-y')   # Placeholder for labels.
+		y = tf.placeholder(tf.float32, [None, 1, num_classes], name='Placeholder-y')   # Placeholder for labels.
 		
 		input_bottleneck = tf.reshape(x, [-1, bottleneck_tensor_size])
 
