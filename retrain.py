@@ -26,11 +26,12 @@ import tensorflow as tf
 from layers import *
 
 HIDDEN_NUM = 8
+NUM_CLASSES = 412
 
 if os.path.exists('.notebook'):
 	bottleneck_tensor_size =  588
 	BATCH_SIZE = 3
-	DISPLAY_INTERVAL, NUM_ITERS = 1, 50
+	DISPLAY_INTERVAL, NUM_ITERS = 1, 500
 else:
 	bottleneck_tensor_size =  2048
 	BATCH_SIZE = 10
@@ -94,7 +95,7 @@ def fullyConnectedLayer(p_in, input_size, num_neurons, func=None, name=''):
 def network1(input_tensor, input_size):
 
 	f1 = fullyConnectedLayer(
-		input_tensor, input_size=bottleneck_tensor_size, num_neurons=1, 
+		input_tensor, input_size=bottleneck_tensor_size, num_neurons=NUM_CLASSES, 
 		func=tf.nn.sigmoid, name='F1') # func=tf.nn.relu
 	
 	return f1
@@ -108,7 +109,7 @@ def network2(input_tensor, input_size, hidden_num=HIDDEN_NUM):
 	
 	drop1 = tf.layers.dropout(inputs=f1, rate=0.4)	
 	
-	f2 = fullyConnectedLayer(drop1, input_size=hidden_num, num_neurons=1, 
+	f2 = fullyConnectedLayer(drop1, input_size=hidden_num, num_neurons=NUM_CLASSES, 
 		func=tf.nn.sigmoid, name='F2')
 
 	return f2
@@ -193,9 +194,7 @@ if __name__ == '__main__':
 	print('num_test_batches:', num_test_batches)
 
 	SAMPLE_SIZE = train['size']
-	min_valid_loss = 1000
-
-	num_classes 
+	min_valid_acc = 0
 
 	#-------------------
 
@@ -207,31 +206,26 @@ if __name__ == '__main__':
 		# 1. Construct a graph representing the model.
 		
 		x = tf.placeholder(tf.float32, [None, 1, bottleneck_tensor_size], name='Placeholder-x') # Placeholder for input.
-		y = tf.placeholder(tf.float32, [None, 1, num_classes], name='Placeholder-y')   # Placeholder for labels.
+		y = tf.placeholder(tf.float32, [None, NUM_CLASSES], name='Placeholder-y')   # Placeholder for labels.
 		
 		input_bottleneck = tf.reshape(x, [-1, bottleneck_tensor_size])
 
 		output = neural_network(input_bottleneck, bottleneck_tensor_size)
 		print('output =', output)
 
+		logits = output
+
 		# 2. Add nodes that represent the optimization algorithm.
-		loss = tf.reduce_mean(tf.square(output - y))
-		#loss = tf.reduce_mean(tf.abs(1 -  tf.abs(tf.abs(output - y) - 1 ))) # 
-		#loss = tf.reduce_mean(tf.squared_difference(y, output))
-		#loss = tf.nn.l2_loss(output - y)
-		#loss = tf.losses.mean_squared_error(labels=y, predictions=output)
-		
-		#optimizer = tf.train.AdagradOptimizer(0.01)
-		optimizer= tf.train.AdagradOptimizer(0.005)
-		#optimizer= tf.train.AdamOptimizer(0.005)
-		#train_op = tf.train.GradientDescentOptimizer(0.01)
-		train_op = optimizer.minimize(loss)
+		# for regression:
+		#loss = tf.reduce_mean(tf.square(output - y))
+		#optimizer= tf.train.AdagradOptimizer(0.005)
+		#train_op = optimizer.minimize(loss)
 			
 		# for classification:
-		#loss = tf.nn.softmax_cross_entropy_with_logits_v2(logits=logits, labels=y)
-		#train_op = tf.train.AdagradOptimizer(0.01).minimize(loss)
-		#correct_prediction = tf.equal(tf.argmax(logits,1), tf.argmax(y,1))
-		#accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+		loss = tf.nn.softmax_cross_entropy_with_logits_v2(logits=logits, labels=y)
+		train_op = tf.train.AdagradOptimizer(0.01).minimize(loss)
+		correct_prediction = tf.equal(tf.argmax(logits,1), tf.argmax(y,1))
+		accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 		output_angles_valid = []
 
@@ -241,17 +235,9 @@ if __name__ == '__main__':
 			sess.run(init)	# Randomly initialize weights.
 			for iteration in range(NUM_ITERS):			  # Train iteratively for NUM_iterationS.		 
 
+				"""
 				if iteration % (100*DISPLAY_INTERVAL) == 0:
 
-					#output_values = output.eval(feed_dict = {x:train['images'][:3]})
-					#print('train: {0:.2f} - {1:.2f}'.format(output_values[0][0]*360, train['labels'][0][0]*360))
-					#print('train: {0:.2f} - {1:.2f}'.format(output_values[1][0]*360, train['labels'][1][0]*360))
-					output_values = output.eval(feed_dict = {x:valid['images'][:3]})
-					print('valid: {0:.2f} - {1:.2f}'.format(output_values[0][0]*360, valid['labels'][0][0]*360))
-					print('valid: {0:.2f} - {1:.2f}'.format(output_values[1][0]*360, valid['labels'][1][0]*360))
-					#print('valid: {0:.2f} - {1:.2f}'.format(output_values[2][0]*360, valid['labels'][2][0]*360))
-					
-					output_angles_valid = []
 					for i in range(num_valid_batches):
 						feed_dict = {x:valid['images'][i*BATCH_SIZE:(i+1)*BATCH_SIZE]}
 						#print(feed_dict)
@@ -262,31 +248,27 @@ if __name__ == '__main__':
 						#print(t)
 						output_angles_valid += t
 					print(output_angles_valid[:max(len(valid),10)])
-
+				"""
 
 				if iteration % (10*DISPLAY_INTERVAL) == 0:
 
-					train_loss = np.mean( [loss.eval( \
+					train_acc = np.mean( [accuracy.eval( \
 						feed_dict={x:train['images'][i*BATCH_SIZE:(i+1)*BATCH_SIZE], \
 						y:train['labels'][i*BATCH_SIZE:(i+1)*BATCH_SIZE]}) \
 						for i in range(0,num_train_batches)])
-					valid_loss = np.mean([ loss.eval( \
+					valid_acc = np.mean([ accuracy.eval( \
 						feed_dict={x:valid['images'][i*BATCH_SIZE:(i+1)*BATCH_SIZE], \
 						y:valid['labels'][i*BATCH_SIZE:(i+1)*BATCH_SIZE]}) \
 						for i in range(0,num_valid_batches)])
 
-					if valid_loss < min_valid_loss:
-						min_valid_loss = valid_loss
+					if valid_acc > min_valid_acc:
+						min_valid_acc = valid_acc
 
-					#min_in_grad = math.sqrt(min_valid_loss) * 360.0
 					epoch = iteration//(num_train_batches // BATCH_SIZE * BATCH_SIZE)
-					print('epoch {0:2} (i={1:06}): train={2:0.2f}, valid={3:0.2f} (min={4:0.2f})'.\
-						format(epoch, iteration, to_deg(train_loss), to_deg(valid_loss), to_deg(min_valid_loss)))
+					print('epoch {0:2} (i={1:06}): train={2:0.4f}, valid={3:0.4f} (min={4:0.4f})'.\
+						format(epoch, iteration, to_deg(train_acc), to_deg(valid_acc), to_deg(min_valid_acc)))
 
-					"""
-					#train_loss = loss.eval(feed_dict = {x:train['images'][0:BATCH_SIZE], y:train['labels'][0:BATCH_SIZE]})
-					#valid_loss = loss.eval(feed_dict = {x:valid['images'][0:BATCH_SIZE], y:valid['labels'][0:BATCH_SIZE]})
-					"""
+					
 				
 				a1 = iteration*BATCH_SIZE % train['size']
 				a2 = (iteration + 1)*BATCH_SIZE % train['size']
