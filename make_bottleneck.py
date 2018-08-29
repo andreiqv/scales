@@ -148,7 +148,9 @@ def create_bootleneck_data(dir_path, shape):
 			arr = np.array(im, dtype=np.float32) / 256
 			label = class_index
 				
-			feature_vector = bottleneck_tensor.eval(feed_dict={ x : [arr] })
+			#feature_vector = bottleneck_tensor.eval(feed_dict={ x : [arr] })
+			feature_vector = None
+
 			feature_vectors.append(feature_vector)
 			labels.append(label)
 			filenames.append(filename) # or file_path
