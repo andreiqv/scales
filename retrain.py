@@ -22,7 +22,7 @@ import gzip
 import tensorflow as tf
 #import tensorflow_hub as hub
 
-from rotate_images import *
+#from rotate_images import *
 from layers import *
 
 HIDDEN_NUM = 8
@@ -147,7 +147,6 @@ if __name__ == '__main__':
 
 	if arguments.hidden_num > 0:
 		HIDDEN_NUM = arguments.hidden_num
-
 
 	#data_1 = load_data(in_dir, img_size=(540,540))
 	#data = split_data(data1, ratio=(6,1,3))
@@ -321,18 +320,6 @@ if __name__ == '__main__':
 			print('test_loss={0:0.4f}'.format(test_loss))				
 			"""
 
-			if False:
-				# Rotate images:
-				print('Rotate images')
-				#in_dir = 'data'
-				out_dir = 'valid'
-				os.system('mkdir -p {0}'.format(out_dir))
-				angles = output_angles_valid
-				file_names = valid['filenames'][:len(angles)]
-				print('len(angles) =', len(angles))
-				print('len(file_names) =', len(file_names))
-				rotate_images_with_angles(in_dir, out_dir, file_names, angles)
-			
 			"""
 			# Saver
 			saver = tf.train.Saver()		

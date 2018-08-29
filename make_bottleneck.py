@@ -16,17 +16,18 @@ import numpy as np
 import tensorflow as tf
 import network
 
+DO_MIX = False
+
 if os.path.exists('.notebook'):
+	data_dir = 'data'
 	module = network.conv_network_224
 else:
+	data_dir = '/home/chichivica/Data/Datasets/Scales/data'
 	import tensorflow_hub as hub
 	module = hub.Module("https://tfhub.dev/google/imagenet/resnet_v2_152/feature_vector/1")		
 
 np.set_printoptions(precision=4, suppress=True)
 
-DO_MIX = False
-RANDOM_ANGLE = False
-MAX_DEGREE = 360
 
 #import tensorflow_hub as hub
 
@@ -96,7 +97,7 @@ def covert_data_to_feature_vector(data):
 
 
 def create_bootleneck_data(dir_path, shape):
-	""" Calculate feature vectors for rotated images using TF.
+	""" Calculate feature vectors for input images using TF.
 	Returns:
 	data : dict {'images':  [list of feature_vectors], 
 				 'labels':  [list of labels], 
@@ -105,6 +106,7 @@ def create_bootleneck_data(dir_path, shape):
 	"""
 	image_size = (shape[0], shape[1])
 	feature_vectors, labels, filenames = [], [], []
+	class_index_set = set()
 
 	files = os.listdir(dir_path)
 	random.shuffle(files)
@@ -116,29 +118,40 @@ def create_bootleneck_data(dir_path, shape):
 	resized_input_tensor = tf.reshape(x, [-1, height, width, 3])
 	#module = hub.Module("https://tfhub.dev/google/imagenet/resnet_v2_152/classification/1")		
 	
-		# num_features = 2048, height x width = 224 x 224 pixels
+	# num_features = 2048, height x width = 224 x 224 pixels
 	assert height, width == hub.get_expected_image_size(module)	
 	bottleneck_tensor = module(resized_input_tensor)  # Features with shape [batch_size, num_features]
-	print('bottleneck_tensor:', bottleneck_tensor)
+	print('bottleneck_tensor:', bottleneck_tensor)	
 
 	with tf.Session() as sess:  # Connect to the TF runtime.
 		init = tf.global_variables_initializer()
 		sess.run(init)	# Randomly initialize weights.
 		
-		for index_file, file in enumerate(files):
+		for index_file, filename in enumerate(files):
 
-			print(file)
-			file_path = dir_path + '/' + file
+			print(filename)
+			base = os.path.splitext(filename)[0]
+			ext = os.path.splitext(filename)[1]
+			if not ext in {'.jpg', ".png"} : continue			
+
+			try:
+				class_index = int(base.split('_')[-1])
+			except:
+				continue
+
+			class_index_set.add(class_index)	
+
+			file_path = dir_path + '/' + filename
 			im = Image.open(file_path)		
 			#sx, sy = im.size
 			im = im.resize(image_size, Image.ANTIALIAS)
-			arr = np.array(box, dtype=np.float32) / 256
-			label = np.array([angle / 360.0], dtype=np.float64)
+			arr = np.array(im, dtype=np.float32) / 256
+			label = class_index
 				
 			feature_vector = bottleneck_tensor.eval(feed_dict={ x : [arr] })
 			feature_vectors.append(feature_vector)
 			labels.append(label)
-			filenames.append(file_path)
+			filenames.append(filename) # or file_path
 
 			im.close()
 
@@ -160,23 +173,24 @@ def create_bootleneck_data(dir_path, shape):
 	#for i in range(len(data['labels'])):
 	#	print('{0} - {1}'.format(data['labels'][i], data['filenames'][i]))
 
+	class_list = list(class_index_set)
+	class_list.sort()
+	print('Number of classes: {0}'.format(len(class_list)))
+	print('Min class index: {0}'.format(min(class_list)))
+	print('Max class index: {0}'.format(max(class_list)))
+
 	return data
 
 
-def make_bottleneck_dump(in_dir, shape, num_angles):
+def make_bottleneck_dump(in_dir, shape):
 
-	max_valid_angles = 10 # to accelerate validation and testing
 	bottleneck_data = dict()
 	parts = ['valid', 'test', 'train']
 	
 	for part in parts:
 		print('\nProcessing {0} data'.format(part))
 		part_dir = in_dir + '/' + part
-		if part == 'train':
-			num_angles_0 = num_angles
-		else:
-			num_angles_0 = max_valid_angles if num_angles > max_valid_angles else num_angles
-		bottleneck_data[part] = create_bootleneck_data(part_dir, shape, num_angles_0)
+		bottleneck_data[part] = create_bootleneck_data(part_dir, shape)
 
 	assert len(bottleneck_data['train']['labels']) == len(bottleneck_data['train']['images'])
 	print('Size of train data:', len(bottleneck_data['train']['labels']))
@@ -204,16 +218,14 @@ def createParser ():
 	ArgumentParser
 	"""
 	parser = argparse.ArgumentParser()
-	parser.add_argument('-n', '--num', default=100, type=int,\
-		help='num_angles for a single picture')
-	parser.add_argument('-md', '--maxdeg', default=90, type=int,\
-		help='num_angles for a single picture')
 	parser.add_argument('-i', '--in_dir', default=None, type=str,\
 		help='input dir')
 	parser.add_argument('-o', '--out_file', default=None, type=str,\
 		help='output file')
 	parser.add_argument('-m', '--mix', dest='mix', action='store_true')
-	parser.add_argument('-r', '--rnd', dest='rnd', action='store_true')
+
+	parser.add_argument('-n', '--num', default=100, type=int,\
+		help='num_angles for a single picture')
 	return parser
 
 
@@ -223,15 +235,11 @@ if __name__ == '__main__':
 	arguments = parser.parse_args(sys.argv[1:])			
 	NUM_ANGLES 	 = arguments.num
 	DO_MIX 		 = arguments.mix
-	RANDOM_ANGLE = arguments.rnd
-	MAX_DEGREE   = arguments.maxdeg
 	print('NUM_ANGLES =', 	NUM_ANGLES)
 	print('DO_MIX =',		DO_MIX)
-	print('RANDOM_ANGLE =', RANDOM_ANGLE)
-	print('MAX_DEGREE =', MAX_DEGREE)
 
 	if not arguments.in_dir:
-		in_dir = 'data'
+		in_dir = data_dir
 	if not arguments.out_file:		
 		out_file = 'dump.gz'
 
