@@ -37,7 +37,7 @@ else:
 	BATCH_SIZE = 10
 	DISPLAY_INTERVAL, NUM_ITERS = 100, 20*1000*1000
 
-to_deg = lambda x : math.sqrt(x) * 360.0
+#to_deg = lambda x : math.sqrt(x) * 360.0
 
 """
 # some functions
@@ -266,7 +266,7 @@ if __name__ == '__main__':
 
 					epoch = iteration//(num_train_batches // BATCH_SIZE * BATCH_SIZE)
 					print('epoch {0:2} (i={1:06}): train={2:0.4f}, valid={3:0.4f} (min={4:0.4f})'.\
-						format(epoch, iteration, to_deg(train_acc), to_deg(valid_acc), to_deg(min_valid_acc)))
+						format(epoch, iteration, train_acc, valid_acc, min_valid_acc))
 
 					
 				
