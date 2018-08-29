@@ -129,7 +129,7 @@ def create_bootleneck_data(dir_path, shape):
 		
 		for index_file, filename in enumerate(files):
 
-			print(filename)
+			#print(filename)
 			base = os.path.splitext(filename)[0]
 			ext = os.path.splitext(filename)[1]
 			if not ext in {'.jpg', ".png"} : continue			
