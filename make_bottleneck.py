@@ -154,10 +154,7 @@ def create_bootleneck_data(dir_path, shape):
 			#sx, sy = im.size
 			im = im.resize(image_size, Image.ANTIALIAS)
 			arr = np.array(im, dtype=np.float32) / 256
-
-				
-			#feature_vector = bottleneck_tensor.eval(feed_dict={ x : [arr] })
-			feature_vector = None
+			feature_vector = bottleneck_tensor.eval(feed_dict={ x : [arr] })			
 
 			feature_vectors.append(feature_vector)
 			labels.append(label)
