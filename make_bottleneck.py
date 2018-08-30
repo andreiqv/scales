@@ -189,7 +189,7 @@ def create_bootleneck_data(dir_path, shape, maps):
 
 			im.close()
 
-			print("{0:3d} -> {1:3d}: {2}".format(class_id, class_index, filename))
+			print("{0}/{1} : {2:3d} -> {3:3d} : {4}".format(index_file, num_files, class_id, class_index, filename))
 
 
 	print('Number of feature_vectors: {0}'.format(len(feature_vectors)))
