@@ -36,6 +36,8 @@ def createParser ():
 	"""	ArgumentParser
 	"""
 	parser = argparse.ArgumentParser()
+	parser.add_argument('-p', '--part', default="", type=str,\
+		help='part')
 	#parser.add_argument('-th', '--threshold', default=0.05, type=float,\
 	#	help='threshold value (default 0.05)')
 	#parser.add_argument('-df', '--diff', dest='diff', action='store_true')
@@ -46,11 +48,12 @@ def createParser ():
 if __name__ == '__main__':	
 
 	parser = createParser()
-	arguments = parser.parse_args(sys.argv[1:])	
+	arguments = parser.parse_args(sys.argv[1:])
+	part = arguments.part
 
-	src_dir = '/home/chichivica/Data/Datasets/Scales/data_all/train'
+	file_list = '/home/chichivica/Data/Datasets/Scales/diff_{0}.txt'.format(part)
+	src_dir = '/home/chichivica/Data/Datasets/Scales/data_all/{0}'.format(part)
 	dst_dir = '/home/chichivica/Data/Datasets/Scales/diff'
-	file_list = '/home/chichivica/Data/Datasets/Scales/diff_train.txt'
 
 	#src_dir = '/w/WORK/ineru/06_scales/data/train/'
 	#dst_dir = '/w/WORK/ineru/06_scales/data/_diff/'
