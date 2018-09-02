@@ -25,7 +25,7 @@ def copy_files_by_list(src_dir, dst_dir, file_list):
 			path = src_dir + '/' + filename
 			cmd = "cp {0} {1}".format(path, dst_dir)
 			print(cmd)
-			
+
 
 
 
@@ -47,13 +47,13 @@ if __name__ == '__main__':
 	parser = createParser()
 	arguments = parser.parse_args(sys.argv[1:])	
 
-	#src_dir = '/home/chichivica/Data/Datasets/Scales/data_all/train'
-	#dst_dir = '/home/chichivica/Data/Datasets/Scales/diff'
-	#file_list = '/home/chichivica/Data/Datasets/Scales/diff_train.txt'
+	src_dir = '/home/chichivica/Data/Datasets/Scales/data_all/train'
+	dst_dir = '/home/chichivica/Data/Datasets/Scales/diff'
+	file_list = '/home/chichivica/Data/Datasets/Scales/diff_train.txt'
 
-	src_dir = '/w/WORK/ineru/06_scales/data/train/'
-	dst_dir = '/w/WORK/ineru/06_scales/data/_diff/'
-	file_list = '/w/WORK/ineru/06_scales/git_scales/diff_train.txt'
+	#src_dir = '/w/WORK/ineru/06_scales/data/train/'
+	#dst_dir = '/w/WORK/ineru/06_scales/data/_diff/'
+	#file_list = '/w/WORK/ineru/06_scales/git_scales/diff_train.txt'
 
 
 	src_dir = src_dir.rstrip('/')
