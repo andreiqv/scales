@@ -25,6 +25,7 @@ def copy_files_by_list(src_dir, dst_dir, file_list):
 			path = src_dir + '/' + filename
 			cmd = "cp {0} {1}".format(path, dst_dir)
 			print(cmd)
+			os.system(cmd)
 
 
 
