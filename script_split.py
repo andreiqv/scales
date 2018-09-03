@@ -16,19 +16,8 @@ import operator # for min
 #import numpy as np
 import random
 
-def copy_files_by_list(src_dir, dst_dir, file_list):
 
-	with open(file_list) as f:
-		for line in f:
-			filename = line.split()[3]
-			#print(filename)
-			path = src_dir + '/' + filename
-			cmd = "cp {0} {1}".format(path, dst_dir)
-			print(cmd)
-			os.system(cmd)
-
-
-def data_split_by_id(src_dir):
+def data_split_by_id(src_dir, dst_dir):
 
 	files = os.listdir(dir_path)
 	random.shuffle(files)
@@ -81,13 +70,11 @@ if __name__ == '__main__':
 
 	src_dir = '/home/chichivica/Data/Datasets/Scales/data/{0}'.format(part)
 	dst_dir = '/home/chichivica/Data/Datasets/Scales/split'
+	src_dir = src_dir.rstrip('/')
+	dst_dir = dst_dir.rstrip('/')
 
 	#src_dir = '/w/WORK/ineru/06_scales/data/train/'
 	#dst_dir = '/w/WORK/ineru/06_scales/data/_diff/'
 	#file_list = '/w/WORK/ineru/06_scales/git_scales/diff_train.txt'
 
-
-	src_dir = src_dir.rstrip('/')
-	dst_dir = dst_dir.rstrip('/')
-
-	copy_files_by_list(src_dir, dst_dir, file_list)
+	copy_files_by_list(src_dir, dst_dir)
