@@ -77,4 +77,4 @@ if __name__ == '__main__':
 	#dst_dir = '/w/WORK/ineru/06_scales/data/_diff/'
 	#file_list = '/w/WORK/ineru/06_scales/git_scales/diff_train.txt'
 
-	copy_files_by_list(src_dir, dst_dir)
+	data_split_by_id(src_dir, dst_dir)
