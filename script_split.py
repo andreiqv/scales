@@ -19,7 +19,7 @@ import random
 
 def data_split_by_id(src_dir, dst_dir):
 
-	files = os.listdir(dir_path)
+	files = os.listdir(src_dir)
 	random.shuffle(files)
 	num_files = len(files)	
 
