@@ -35,7 +35,7 @@ def data_split_by_id(src_dir, dst_dir):
 		except:
 			continue
 	
-		sub_dir = dst_dir + '/' + src(class_id)
+		sub_dir = dst_dir + '/' + str(class_id)
 		src_path = src_dir + '/' + filename
 		dst_path = sub_dir + '/' + filename
 
