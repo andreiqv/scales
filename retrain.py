@@ -30,7 +30,7 @@ HIDDEN_NUM = 8
 
 if os.path.exists('.notebook'):
 	bottleneck_tensor_size =  588
-	BATCH_SIZE = 3
+	BATCH_SIZE = 2
 	DISPLAY_INTERVAL, NUM_ITERS = 1, 500
 else:
 	bottleneck_tensor_size =  2048
@@ -231,10 +231,14 @@ if __name__ == '__main__':
 		accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32)) # top-1
 
 		#acc_top5 = tf.metrics.mean(tf.nn.in_top_k(predictions=logits, targets=y, k=5))
+		"""
 		indices_1 = tf.nn.top_k(logits, k=5)
 		indices_2 = tf.nn.top_k(y, k=5)
 		correct = tf.equal(indices_1, indices_2)
 		acc_top5 = tf.reduce_mean(tf.cast(correct, 'float'))
+		"""
+		labels1 = tf.argmax(y, 1)
+		acc_top5 = tf.nn.in_top_k(logits, labels1, 5)
 
 
 		output_angles_valid = []
