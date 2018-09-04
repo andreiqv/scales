@@ -22,10 +22,11 @@ DO_MIX = True
 
 if os.path.exists('.notebook'):
 	#data_dir = '../data'
-	data_dir = '../separated'	
+	data_dir = '../separated'
 	module = network.conv_network_224
 else:
-	data_dir = '/home/chichivica/Data/Datasets/Scales/data'
+	#data_dir = '/home/chichivica/Data/Datasets/Scales/data'
+	data_dir = '/home/chichivica/Data/Datasets/Scales/separated'
 	import tensorflow_hub as hub
 	module = hub.Module("https://tfhub.dev/google/imagenet/resnet_v2_152/feature_vector/1")		
 
