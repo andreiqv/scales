@@ -228,7 +228,14 @@ if __name__ == '__main__':
 		loss = tf.nn.softmax_cross_entropy_with_logits_v2(logits=logits, labels=y)
 		train_op = tf.train.AdagradOptimizer(0.01).minimize(loss)
 		correct_prediction = tf.equal(tf.argmax(logits,1), tf.argmax(y,1))
-		accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+		accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32)) # top-1
+
+		#acc_top5 = tf.metrics.mean(tf.nn.in_top_k(predictions=logits, targets=y, k=5))
+		_, indices_1 = tf.nn.top_k(logits, 3)
+		_, indices_2 = tf.nn.top_k(y, 3)
+		correct = tf.equal(indices_1, indices_2)
+		acc_top5 = tf.reduce_mean(tf.cast(correct, 'float'))
+
 
 		output_angles_valid = []
 
@@ -264,12 +271,21 @@ if __name__ == '__main__':
 						y:valid['labels'][i*BATCH_SIZE:(i+1)*BATCH_SIZE]}) \
 						for i in range(0,num_valid_batches)])
 
+					train_acc_top5 = np.mean( [acc_top5.eval( \
+						feed_dict={x:train['images'][i*BATCH_SIZE:(i+1)*BATCH_SIZE], \
+						y:train['labels'][i*BATCH_SIZE:(i+1)*BATCH_SIZE]}) \
+						for i in range(0,num_train_batches)])
+					valid_acc_top5 = np.mean([ acc_top5.eval( \
+						feed_dict={x:valid['images'][i*BATCH_SIZE:(i+1)*BATCH_SIZE], \
+						y:valid['labels'][i*BATCH_SIZE:(i+1)*BATCH_SIZE]}) \
+						for i in range(0,num_valid_batches)])					
+
 					if valid_acc > min_valid_acc:
 						min_valid_acc = valid_acc
 
 					epoch = iteration//(num_train_batches // BATCH_SIZE * BATCH_SIZE)
-					print('epoch {0:2} (i={1:06}): train={2:0.4f}, valid={3:0.4f} (max={4:0.4f})'.\
-						format(epoch, iteration, train_acc, valid_acc, min_valid_acc))
+					print('epoch {0:2} (i={1:06}): train={2:0.4f}, valid={3:0.4f} (max={4:0.4f}) [top5={5:0.4f}]'.\
+						format(epoch, iteration, train_acc, valid_acc, min_valid_acc, valid_acc_top5))
 
 					
 				
