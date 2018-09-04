@@ -231,8 +231,8 @@ if __name__ == '__main__':
 		accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32)) # top-1
 
 		#acc_top5 = tf.metrics.mean(tf.nn.in_top_k(predictions=logits, targets=y, k=5))
-		_, indices_1 = tf.nn.top_k(logits, 3)
-		_, indices_2 = tf.nn.top_k(y, 3)
+		indices_1 = tf.nn.top_k(logits, k=5)
+		indices_2 = tf.nn.top_k(y, k=5)
 		correct = tf.equal(indices_1, indices_2)
 		acc_top5 = tf.reduce_mean(tf.cast(correct, 'float'))
 
