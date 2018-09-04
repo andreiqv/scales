@@ -368,9 +368,10 @@ def make_bottleneck_dump_subdir(src_dir, shape):
 		data['labels']    = [x[1] for x in zip3]
 		data['filenames'] = [x[2] for x in zip3]
 
-	bottleneck_data = split_data.split_data(data, ratio=[1,1,1])
-	bottleneck_data['id_label'] = map_id_label
-	bottleneck_data['label_id'] = map_label_id
+	data = split_data.split_data(data, ratio=[1,1,1])
+
+	data['id_label'] = map_id_label
+	data['label_id'] = map_label_id
 
 	return data
 
