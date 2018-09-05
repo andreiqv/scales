@@ -272,7 +272,7 @@ def make_bottleneck_dump(src_dir, shape):
 
 #------------------------------------------------
 
-def make_bottleneck_dump_subdir(src_dir, shape):
+def make_bottleneck_dump_subdir(src_dir, shape, ratio):
 	"""
 	Use names of subdirs as a id.
 	And then calculate class_index from id.
@@ -378,7 +378,7 @@ def make_bottleneck_dump_subdir(src_dir, shape):
 		data['filenames'] = [x[2] for x in zip3]
 
 	print('Split data')
-	data = split_data.split_data(data, ratio=[2,1,1])
+	data = split_data.split_data(data, ratio=ratio)
 	data['id_label'] = map_id_label
 	data['label_id'] = map_label_id
 
@@ -432,6 +432,7 @@ if __name__ == '__main__':
 
 	#bottleneck_data = make_bottleneck_dump(in_dir=in_dir, shape=shape)
 
-	bottleneck_data = make_bottleneck_dump_subdir(src_dir=src_dir, shape=SHAPE)	
+	bottleneck_data = make_bottleneck_dump_subdir(
+		src_dir=src_dir, shape=SHAPE, ratio=[9,1,1])	
 
 	save_data_dump(bottleneck_data, dst_file=dst_file)
