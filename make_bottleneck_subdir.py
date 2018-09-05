@@ -24,11 +24,20 @@ if os.path.exists('.notebook'):
 	#data_dir = '../data'
 	data_dir = '../separated'
 	module = network.conv_network_224
+	SHAPE = 224, 224, 3
 else:
 	#data_dir = '/home/chichivica/Data/Datasets/Scales/data'
 	data_dir = '/home/chichivica/Data/Datasets/Scales/separated'
 	import tensorflow_hub as hub
-	module = hub.Module("https://tfhub.dev/google/imagenet/resnet_v2_152/feature_vector/1")		
+	n_model = 2
+	if n_model == 1:
+		module = hub.Module("https://tfhub.dev/google/imagenet/resnet_v2_152/feature_vector/1")
+		SHAPE = 224, 224, 3
+	elif n_model == 2:
+		module = hub.Module("https://tfhub.dev/google/imagenet/inception_v3/feature_vector/1")
+		SHAPE = 299, 299, 3
+	else:
+		raise Exception('Bad n_model')
 
 np.set_printoptions(precision=4, suppress=True)
 
@@ -154,7 +163,7 @@ def create_bootleneck_data(dir_path, shape, maps):
 	height, width, color =  shape
 	x = tf.placeholder(tf.float32, [None, height, width, 3], name='Placeholder-x')
 	resized_input_tensor = tf.reshape(x, [-1, height, width, 3])
-	#module = hub.Module("https://tfhub.dev/google/imagenet/resnet_v2_152/classification/1")		
+	#module = hub.Module("https://tfhub.dev/google/imagenet/resnet_v2_152/classification/1")
 	
 	# num_features = 2048, height x width = 224 x 224 pixels
 	assert height, width == hub.get_expected_image_size(module)	
@@ -369,7 +378,7 @@ def make_bottleneck_dump_subdir(src_dir, shape):
 		data['filenames'] = [x[2] for x in zip3]
 
 	print('Split data')
-	data = split_data.split_data(data, ratio=[8,1,1])
+	data = split_data.split_data(data, ratio=[2,1,1])
 	data['id_label'] = map_id_label
 	data['label_id'] = map_label_id
 
@@ -421,9 +430,8 @@ if __name__ == '__main__':
 	if not arguments.dst_file:		
 		dst_file = 'dump.gz'
 
-	shape = 224, 224, 3	
 	#bottleneck_data = make_bottleneck_dump(in_dir=in_dir, shape=shape)
 
-	bottleneck_data = make_bottleneck_dump_subdir(src_dir=src_dir, shape=shape)	
+	bottleneck_data = make_bottleneck_dump_subdir(src_dir=src_dir, shape=SHAPE)	
 
 	save_data_dump(bottleneck_data, dst_file=dst_file)

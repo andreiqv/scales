@@ -237,8 +237,8 @@ if __name__ == '__main__':
 		correct = tf.equal(indices_1, indices_2)
 		acc_top5 = tf.reduce_mean(tf.cast(correct, 'float'))
 		"""
-		labels1 = tf.argmax(y, 1)
-		acc_top5 = tf.nn.in_top_k(logits, labels1, 5)
+
+		acc_top5 = tf.nn.in_top_k(logits, tf.argmax(y,1), 5)
 
 
 		output_angles_valid = []
