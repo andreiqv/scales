@@ -31,8 +31,8 @@ else:
 	import tensorflow_hub as hub
 
 	model_number = 3
-	#type_model = 'feature_vector'
-	type_model = 'classification'
+	type_model = 'feature_vector'
+	#type_model = 'classification'
 	
 	if model_number == 1:		
 		module = hub.Module("https://tfhub.dev/google/imagenet/resnet_v2_152/{0}/1".format(type_model))
