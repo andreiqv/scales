@@ -293,7 +293,7 @@ if __name__ == '__main__':
 						min_valid_acc = valid_acc
 
 					epoch = iteration//(num_train_batches // BATCH_SIZE * BATCH_SIZE)
-					print('epoch {0:2} (i={1:06}): train={2:0.4f}, valid={3:0.4f} (max={4:0.4f}) [top5={5:0.4f}, top5={6:0.4f}]'.\
+					print('epoch {0:2} (i={1:06}): train={2:0.4f}, valid={3:0.4f} (max={4:0.4f}) [top5={5:0.4f}, top6={6:0.4f}]'.\
 						format(epoch, iteration, train_acc, valid_acc, min_valid_acc, valid_acc_top5, valid_acc_top6))
 
 					
