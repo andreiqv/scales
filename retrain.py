@@ -240,6 +240,7 @@ if __name__ == '__main__':
 		"""
 
 		acc_top5 = tf.nn.in_top_k(logits, tf.argmax(y,1), 5)
+		acc_top6 = tf.nn.in_top_k(logits, tf.argmax(y,1), 6)
 
 
 		output_angles_valid = []
@@ -276,21 +277,24 @@ if __name__ == '__main__':
 						y:valid['labels'][i*BATCH_SIZE:(i+1)*BATCH_SIZE]}) \
 						for i in range(0,num_valid_batches)])
 
-					train_acc_top5 = np.mean( [acc_top5.eval( \
-						feed_dict={x:train['images'][i*BATCH_SIZE:(i+1)*BATCH_SIZE], \
-						y:train['labels'][i*BATCH_SIZE:(i+1)*BATCH_SIZE]}) \
-						for i in range(0,num_train_batches)])
+					#train_acc_top5 = np.mean( [acc_top5.eval( \
+					#	feed_dict={x:train['images'][i*BATCH_SIZE:(i+1)*BATCH_SIZE], \
+					#	y:train['labels'][i*BATCH_SIZE:(i+1)*BATCH_SIZE]}) \
+					#	for i in range(0,num_train_batches)])
 					valid_acc_top5 = np.mean([ acc_top5.eval( \
 						feed_dict={x:valid['images'][i*BATCH_SIZE:(i+1)*BATCH_SIZE], \
 						y:valid['labels'][i*BATCH_SIZE:(i+1)*BATCH_SIZE]}) \
 						for i in range(0,num_valid_batches)])					
-
+					valid_acc_top6 = np.mean([ acc_top6.eval( \
+						feed_dict={x:valid['images'][i*BATCH_SIZE:(i+1)*BATCH_SIZE], \
+						y:valid['labels'][i*BATCH_SIZE:(i+1)*BATCH_SIZE]}) \
+						for i in range(0,num_valid_batches)])		
 					if valid_acc > min_valid_acc:
 						min_valid_acc = valid_acc
 
 					epoch = iteration//(num_train_batches // BATCH_SIZE * BATCH_SIZE)
-					print('epoch {0:2} (i={1:06}): train={2:0.4f}, valid={3:0.4f} (max={4:0.4f}) [top5={5:0.4f}]'.\
-						format(epoch, iteration, train_acc, valid_acc, min_valid_acc, valid_acc_top5))
+					print('epoch {0:2} (i={1:06}): train={2:0.4f}, valid={3:0.4f} (max={4:0.4f}) [top5={5:0.4f}, top5={6:0.4f}]'.\
+						format(epoch, iteration, train_acc, valid_acc, min_valid_acc, valid_acc_top5, valid_acc_top6))
 
 					
 				
