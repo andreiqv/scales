@@ -33,8 +33,8 @@ if os.path.exists('.notebook'):
 	BATCH_SIZE = 2
 	DISPLAY_INTERVAL, NUM_ITERS = 1, 500
 else:
-	#bottleneck_tensor_size =  2048
-	bottleneck_tensor_size =  1001
+	bottleneck_tensor_size =  2048
+	#bottleneck_tensor_size =  1001
 	BATCH_SIZE = 10
 	DISPLAY_INTERVAL, NUM_ITERS = 100, 20*1000*1000
 
